@@ -24,6 +24,7 @@ contract Staking is Ownable, ReentrancyGuard {
     event UnStaked(address _who, uint256 _when, uint256 _howmuch);
 
     constructor(address _stakingToken, uint256 _startTime, uint256 _endTime) {
+        require(_stakingToken != address(0), "Staking Token can not be Zero Address")
         stakingToken = IERC20(_stakingToken);
         startTime = _startTime;
         endTime = _endTime;
