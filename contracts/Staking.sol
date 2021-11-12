@@ -37,14 +37,14 @@ contract Staking is Ownable, ReentrancyGuard {
         totalStake = totalStake.add(amount);
         userStake[msg.sender] = userStake[msg.sender].add(amount);
         noOfStakes = noOfStakes.add(1);
-        stakingToken.transferFrom(msg.sender, address(this), amount);
+        stakingToken.safeTransferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, _time, amount);
     }
 
     function withdraw(address _to) external onlyOwner {
         require(_to != address(0), "Withdraw:: _to Can not be Zero Address");
         uint256 _totalStake = IERC20(stakingToken).balanceOf(address(this));
-        stakingToken.transfer(_to, _totalStake);
+        stakingToken.safeTransfer(_to, _totalStake);
         emit UnStaked(_to, block.timestamp, _totalStake);
     }
 }
