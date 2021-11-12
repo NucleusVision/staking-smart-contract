@@ -3,12 +3,13 @@ pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract Staking is Ownable, ReentrancyGuard {
     IERC20 public stakingToken;
+    using SafeERC20 for IERC20;
     using SafeMath for uint256;
     
     uint256 public noOfStakes;
@@ -36,14 +37,14 @@ contract Staking is Ownable, ReentrancyGuard {
         totalStake = totalStake.add(amount);
         userStake[msg.sender] = userStake[msg.sender].add(amount);
         noOfStakes = noOfStakes.add(1);
-        require(stakingToken.transferFrom(msg.sender, address(this), amount), "Stake:: Transfer Failed");
+        stakingToken.transferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, _time, amount);
     }
 
     function withdraw(address _to) external onlyOwner {
         require(_to != address(0), "Withdraw:: _to Can not be Zero Address");
         uint256 _totalStake = IERC20(stakingToken).balanceOf(address(this));
-        require(stakingToken.transfer(_to, _totalStake), "Withdraw:: Transfer Failed");
+        stakingToken.transfer(_to, _totalStake);
         emit UnStaked(_to, block.timestamp, _totalStake);
     }
 }
