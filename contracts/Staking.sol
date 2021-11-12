@@ -24,7 +24,7 @@ contract Staking is Ownable, ReentrancyGuard {
     event UnStaked(address _who, uint256 _when, uint256 _howmuch);
 
     constructor(address _stakingToken, uint256 _startTime, uint256 _endTime) {
-        require(_stakingToken != address(0), "Staking Token can not be Zero Address")
+        require(_stakingToken != address(0), "Staking Token can not be Zero Address");
         stakingToken = IERC20(_stakingToken);
         startTime = _startTime;
         endTime = _endTime;
@@ -37,14 +37,14 @@ contract Staking is Ownable, ReentrancyGuard {
         totalStake = totalStake.add(amount);
         userStake[msg.sender] = userStake[msg.sender].add(amount);
         noOfStakes = noOfStakes.add(1);
-        stakingToken.transferFrom(msg.sender, address(this), amount);
+        require(stakingToken.transferFrom(msg.sender, address(this), amount), "Stake:: Transfer Failed");
         emit Staked(msg.sender, _time, amount);
     }
 
     function withdraw(address _to) external onlyOwner {
         require(_to != address(0), "Withdraw:: _to Can not be Zero Address");
         uint256 _totalStake = IERC20(stakingToken).balanceOf(address(this));
-        stakingToken.transfer(_to, _totalStake);
+        require(stakingToken.transfer(_to, _totalStake), "Withdraw:: Transfer Failed");
         emit UnStaked(_to, block.timestamp, _totalStake);
     }
 }
